@@ -21,13 +21,13 @@ print("\nStart:")
 #puzzle = Sudoku('483921657967345821251876493548132976729564138136798245372689514814253769695417382')  #solved
 
 # ------ easy
-puzzle = Sudoku('..3.2.6..9..3.5..1..18.64....81.29..7.......8..67.82....26.95..8..2.3..9..5.1.3..')  
+# puzzle = Sudoku('..3.2.6..9..3.5..1..18.64....81.29..7.......8..67.82....26.95..8..2.3..9..5.1.3..')  
 
 # ------ harder
-#puzzle = Sudoku('4173698.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......')
+# puzzle = Sudoku('4173698.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......')
 
 # ------ hardest
-#puzzle = Sudoku('1....7.9..3..2...8..96..5....53..9...1..8...26....4...3......1..4......7..7...3..')
+puzzle = Sudoku('1....7.9..3..2...8..96..5....53..9...1..8...26....4...3......1..4......7..7...3..')
 
 puzzle.display(puzzle.infer_assignment())
 start = time()
@@ -35,10 +35,19 @@ start = time()
 
 # 2. Solve the puzzle; select ONLY one of the following algorithms
 
-depth_first_graph_search(puzzle)
-#backtracking_search(puzzle)
-#AC3(puzzle)
-#min_conflicts(puzzle)
+
+#Does not work fast
+# depth_first_graph_search(puzzle)
+
+#Works within 45 seconds for easy
+backtracking_search(puzzle)
+
+# Super fast for the easy puzzle, does not compute the medium and hard problem
+
+# AC3(puzzle)
+
+# Sucks, borke after 1.45 for easy
+# min_conflicts(puzzle)
 
 
 # 3. Print the results
@@ -48,7 +57,7 @@ if puzzle.goal_test(puzzle.infer_assignment()):
     puzzle.display(puzzle.infer_assignment())
 else:
     print("Failed - domains: ")
-    #print str(puzzle.curr_domains)
+    # print str(puzzle.curr_domains)
 
     
 # 4. Print elapsed time

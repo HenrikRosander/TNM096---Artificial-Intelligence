@@ -129,11 +129,12 @@ def conv2string(i):
                     h+="0"
     return h
 
-# startPuzzle = np.array( [[7, 2, 4], [5, "", 6], [8, 3, 1]])
+startPuzzle = np.array( [[7, 2, 4], [5, "", 6], [8, 3, 1]])
 
 # startPuzzle = np.array([[6, 4, 7], [8, 5, ""], [3, 2, 1]])
 
 # startPuzzle = np.array([[4, 1, 3], [7, 2, 6], ["", 5, 8]])
+
 
 #Goal array
 # goalPuzzle = np.array([[1,2,3], [4,5,6], [7,8,""]])
@@ -142,11 +143,11 @@ def conv2string(i):
 
 if(h_method=="h1"):
     # startPuzzle = np.array([[6, 4, 7], [8, 5, ""], [3, 2, 1]])
-    startPuzzle = np.array([[6, 4, 7], [8, 5, ""], [3, 2, 1]])
+    startPuzzle = np.array( [[7, 2, 4], [5, "", 6], [8, 3, 1]])
     goalPuzzle = np.array([[1,2,3], [4,5,6], [7,8,""]])
     h = calc_h1(startPuzzle, goalPuzzle)
 if(h_method=="h2"):
-    startPuzzle = np.array([[6, 4, 7], [8, 5, 0], [3, 2, 1]])
+    startPuzzle = np.array( [[7, 2, 4], [5, 0, 6], [8, 3, 1]])
     goalPuzzle = np.array([[1,2,3], [4,5,6], [7,8,0]])
     h = calc_h2(startPuzzle, goalPuzzle)
 

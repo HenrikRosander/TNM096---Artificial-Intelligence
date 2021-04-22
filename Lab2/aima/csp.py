@@ -248,7 +248,7 @@ def mac(csp, var, value, assignment, removals):
 
 
 def backtracking_search(csp,
-                        select_unassigned_variable=first_unassigned_variable,
+                        select_unassigned_variable=mrv,
                         order_domain_values=unordered_domain_values,
                         inference=no_inference):
     """[Figure 6.5]"""
@@ -288,6 +288,7 @@ def min_conflicts(csp, max_steps=100000):
     for i in range(max_steps):
         conflicted = csp.conflicted_vars(current)
         if not conflicted:
+            print(i)
             return current
         var = random.choice(conflicted)
         val = min_conflicts_value(csp, var, current)
