@@ -1,6 +1,7 @@
 import os
 import sys
 import itertools
+import random
 
 class theSchedule:
 
@@ -14,6 +15,8 @@ def schedule(classes, classrooms):
         print("Error with classes/classrooms")
         return
 
+    random.shuffle(classes)
+    print((classrooms))
     # myScheudule = theSchedule(classes, classrooms)
 
     shc = []
@@ -42,6 +45,8 @@ def schedule(classes, classrooms):
                         shc.append([klass, hour, i])    
                         finallist.append([klass, hour, i])    
                         break
+
+    #Print function
     length=8
     print("   ", end="")
     meaninglesscounter = 0
@@ -63,13 +68,10 @@ def schedule(classes, classrooms):
         print(e[0], "   ", end="")               
                         
 
-
-
-
-                    
-
 def checkFirstdigit(input1, sch, hour):
     for input2 in sch:
+        if(input1=="MT501" or input1 == "MT502"):
+            return True
         if(input1[2] == input2[0][2]):
             if(hour == input2[1]):
                 return False

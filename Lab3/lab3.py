@@ -1,99 +1,146 @@
 import random
+import copy
 
-
-class Clausel():
-    def __init__(self, arg):
-        #Posivtive literals
+class Clause():
+    def __init__(self, arg, empty=False):
         self.p = set()
-        #Negative literals
         self.n = set()
-        
-        self.parse(arg)
+        if not empty:
+            self.__parse(arg)    
 
-    def parse(self, arg):
-        a = arg.split("V")
-        for var in a:
-            var = var.strip()
-            if("-" in var):
-                var = var.strip("-")
-                self.n.add(var)
+    def __hash__(self):
+        return hash((frozenset(self.p), frozenset(self.n)))
+
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        return self.p == other.p and self.n == other.n
+
+    def __parse(self, arg):
+        arr = arg.split("V")
+        assert len(arr) >= 1
+        for item in arr:
+            c = item.strip()
+            if len(c) == 0:
+                continue
+            if c[0] == "-":
+                self.n.add(c[1:])
             else:
-                self.p.add(var)
-        
-        # print(self.p, self.n)
+                self.p.add(c)
 
-class C():
-        def __init__(self, p, n):
-            self.p = p
-            self.n = n
+    def __str__(self):
+        values = []
+        for value in self.p:
+            values.append(value)
+        for value in self.n:
+            values.append("-" + value)
+        return " V ".join(values)
 
-def Resolution(a,b):
+    def __len__(self):
+        return len(self.p) + len(self.n) 
 
-    #Find intersections
-    cond1 = a.p & b.n
-    cond2 = a.n & b.p
+    def is_subset(self, other):
+        return self.p.issubset(other.p) and self.n.issubset(other.n)
+
+    def is_strict_subset(self, other):
+        sub = self.is_subset(other)
+        l1 = len(self.p) + len(self.n)
+        l2 = len(other.p) + len(other.n)
+        return sub and l1 < l2
+
+def resolution(a, b):
+    a = copy.deepcopy(a)
+    b = copy.deepcopy(b)
+
+    x1 = a.p & b.n # intersection
+    x2 = a.n & b.p
     
-    # print("From resolution: ", (cond1), (cond2))
-
-    if(not bool(cond1) and not bool(cond2)):
+    if len(x1) == 0 and len(x2) == 0:
         return False
-
-    if(bool(cond1)):
-        temp = set(random.sample(cond1, 1))
-        a.p = a.p - temp
-        b.n = b.n - temp
+    if len(x1) != 0:
+        item = random.sample(x1, 1)[0]
+        a.p.remove(item)
+        b.n.remove(item)
     else:
-        temp = set(random.sample(cond2, 1))
-        # print(temp, a.p, "\n")
-        b.p = b.p - temp
-        a.n = a.n - temp
+        item = random.sample(x2, 1)[0]
+        a.n.remove(item)
+        b.p.remove(item)
 
-
-
-
-    c = C((a.p | b.p), (a.n | b.n))
-    
-    # print(c.p, c.n)
-    if(bool(c.p & c.n)):
+    c = Clause("", empty=True)
+    c.p = a.p | b.p # union
+    c.n = a.n | b.n
+    if len(c.p & c.n) != 0:
         return False
-    
-    
-    # Do stuff
-    return (c.p | c.n)
-    
+    return c
 
-    
-if __name__=="__main__":
-    #Execute
+def solver(kb):
+    while True:
+        kb = copy.deepcopy(kb)
+        kb_prim = copy.deepcopy(kb)
+        s = set()
 
-    # This task is about to implement the resolution inference mechanism applied to formulae (called
-    # clauses) in Conjunctive Normal Form (CNF) for propositional logic. In particular, you have to
-    # write a program that implements:
+        my_list = list(kb)
+        for i in range(len(kb)-1):
+            for j in range(i+1, len(kb)):
+                c = resolution(my_list[i], my_list[j])
+                if c is not False:
+                    print(type(c))
+                    s.add(c)
+        
+        # nothing to do
+        if len(s) == 0:
+            return kb
 
-    # 1. The resolution of two clauses in CNF. That is, given two clauses the program calculates
-    # their resolvent by applying one resolution step.
-    
-    #Enter two Clausels 
-    # C1: (A, B , C)
-    # C2 : (>B, >C)
-    A = Clausel("a V b V -c")
-    B = Clausel("c V b")
-    result = Resolution(A,B)
-    print(result)
+        # if something in s (a) is a strict subset to something in kb (b), meaning: b have everything in a + more
+        # => remove b and use a instead
+        for a in s:
+            items_to_remove = set()
+            for b in kb:
+                if a.is_strict_subset(b):
+                    items_to_remove.add(b)
+            for item in items_to_remove:
+                kb.remove(item)
+            kb.add(a)
 
-    A = Clausel("a V b v -c")
-    B = Clausel("d V b V -g")
-    result = Resolution(A,B)
-    print(result)
-
-    A = Clausel("-b V c V t")
-    B = Clausel("-c V z V b")
-    result = Resolution(A,B)
-    print(result)
+        if kb == kb_prim:
+            return kb
 
 
-    # 2. The resolution mechanism applied to a given set S of clauses. Given S, the program selects
-    # two arbitrary clauses from S, or any previously calculated resolvent, and calculates the
-    # new resolvents2
-    # . The program applies the resolution step until no new resolvent can be
-    # derived.
+if __name__ == "__main__":
+    print("TASK 1:")
+    # 1. 
+    # The resolution of two clauses in CNF. That is, given two clauses the 
+    # program calculates their resolvent by applying one resolution step.
+    A = Clause("a V b V -c")
+    B = Clause("c V b")
+    res = resolution(A, B)
+    print(res)
+    assert res == Clause("a V b")
+
+    A = Clause("a V b V -c")
+    B = Clause("d V b V -g")
+    res = resolution(A, B)
+    print(res)
+    assert res == False
+
+    A = Clause("-b V c V t")
+    B = Clause("-c V z V b")
+    res = resolution(A, B)
+    print(res)
+    assert res == False
+
+    print("")
+    print("TASK 2:")
+    # 2.
+    # The resolution mechanism applied to a given set S of clauses.
+    # Given S, the program selectstwo arbitrary clauses from S, or any previously calculated resolvent, and calculates thenew resolvents.
+    # The program applies the resolution step until no new resolvent can bederived.
+    KB = set()
+    KB.add(Clause("-sun V -money V ice"))
+    KB.add(Clause("-money V ice V movie"))
+    KB.add(Clause("-movie V money"))
+    KB.add(Clause("-movie V -ice"))
+    KB.add(Clause("movie"))
+    res = solver(KB)
+    for item in res:
+        print(item)
