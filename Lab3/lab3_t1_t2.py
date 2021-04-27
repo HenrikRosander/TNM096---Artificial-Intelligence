@@ -1,6 +1,7 @@
 import random
 import copy
 
+#Should work
 class Clausel():
     def __init__(self, arg, trim = False):
         #Posivtive literals
@@ -45,12 +46,7 @@ class Clausel():
         l1 = len(self.p) + len(self.n)
         l2 = len(other.p) + len(other.n)
         return sub and l1 < l2
-
-class C():
-        def __init__(self, p, n):
-            self.p = p
-            self.n = n
-
+#Should work
 def Resolution(a,b):
 
     a = copy.deepcopy(a)
@@ -65,14 +61,17 @@ def Resolution(a,b):
         return False
 
     if(bool(cond1)):
-        temp = set(random.sample(cond1, 1))
-        a.p = a.p - temp
-        b.n = b.n - temp
+        temp = random.sample(cond1, 1)[0]
+        a.p.remove(temp)
+        b.n.remove(temp)
     else:
-        temp = set(random.sample(cond2, 1))
+        temp = random.sample(cond2, 1)[0]
+        # print(temp)
         # print(temp, a.p, "\n")
-        b.p = b.p - temp
-        a.n = a.n - temp
+        
+        b.p.remove(temp)
+        a.n.remove(temp)
+        
 
     c = Clausel("", True)
 
@@ -82,12 +81,10 @@ def Resolution(a,b):
     # print(c.p, c.n)
     if(bool(c.p & c.n)):
         return False
-    
     # Do stuff
     return c
-    
+
 def solver(KB):
-    co = 0
     while True:
 
         KB_p = copy.deepcopy(KB)
@@ -96,14 +93,14 @@ def solver(KB):
         s = set()
 
         ## Add all resolutions to a set s
-        for i in KB:
-            for j in KB:
-                if(i == j):
-                    continue
-                c = Resolution(i, j)
-                if(c is not False):
+        my_list = list(KB)
+        for i in range(len(KB)-1):
+            for j in range(i+1, len(KB)):
+                c = Resolution(my_list[i], my_list[j])
+                if c is not False:
+                    # print(c)
                     s.add(c)
-
+        
         #Base case
         if(len(s)==0):
             return KB 
@@ -117,14 +114,15 @@ def solver(KB):
                 
 def Incorporate(S, KB):
     for A in S:
-        KB = Incorporate_clause(A, KB) 
+        KB = Incorporate_clause(A, KB)
+        KB.add(A) 
     return KB
 
 def Incorporate_clause(A, KB):
     temp = set()
 
     for b in KB:
-        if(is_strict_subset(A, B)):
+        if(is_strict_subset(A, b)):
             temp.add(b)
     #Might have to change this.
     for item in temp:
