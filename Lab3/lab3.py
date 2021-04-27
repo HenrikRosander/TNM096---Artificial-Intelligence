@@ -97,6 +97,7 @@ def solver(kb):
             items_to_remove = set()
             for b in kb:
                 if a.is_strict_subset(b):
+                    print(bool(a.is_strict_subset(b)))
                     items_to_remove.add(b)
             for item in items_to_remove:
                 kb.remove(item)

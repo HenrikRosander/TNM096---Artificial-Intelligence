@@ -13,6 +13,11 @@ class Clausel():
     def __hash__(self):
             return hash((frozenset(self.p), frozenset(self.n)))
 
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        return self.p == other.p and self.n == other.n
+
     def parse(self, arg):
         a = arg.split("V")
         for var in a:
@@ -24,6 +29,13 @@ class Clausel():
                 self.p.add(var)
         
         # print(self.p, self.n)
+    def __str__(self):
+        values = []
+        for value in self.p:
+            values.append(value)
+        for value in self.n:
+            values.append("-" + value)
+        return " V ".join(values)
 
     def is_subset(self, other):
         return self.p.issubset(other.p) and self.n.issubset(other.n)
@@ -62,9 +74,6 @@ def Resolution(a,b):
         b.p = b.p - temp
         a.n = a.n - temp
 
-
-
-
     c = Clausel("", True)
 
     c.p = a.p | b.p # union
@@ -99,26 +108,12 @@ def solver(KB):
         if(len(s)==0):
             return KB 
 
-        # for a in s:
-        #     items_to_remove = set()
-        #     for b in kb:
-        #         if a.is_strict_subset(b):
-        #             items_to_remove.add(b)
-        #     for item in items_to_remove:
-        #         kb.remove(item)
-        #     kb.add(a)
-
-        # if kb == kb_prim:
-        #     return kb
-
         KB = Incorporate(s, KB)
         
         #Catching another potential base case.
         if(KB_p == KB):
             return KB
-
-        
-        
+   
                 
 def Incorporate(S, KB):
     for A in S:
@@ -138,10 +133,11 @@ def Incorporate_clause(A, KB):
 
 
 def is_strict_subset(a,b):
-    if(a == b):
-        return True
-    # print("a:", a, "b:", b)
-    return a.is_subset(b)
+    sub = a.is_subset(b)
+    l1 = len(a.p) + len(a.n)
+    l2 = len(b.p) + len(b.n)
+    return sub and l1 < l2
+
 
 
 if __name__=="__main__":
@@ -178,7 +174,7 @@ if __name__=="__main__":
     # new resolvents2
     # . The program applies the resolution step until no new resolvent can be
     # derived.
-
+    print()
     KB = set()
     KB.add(Clausel("-sun V -money V ice"))
     KB.add(Clausel("-money V ice V movie"))
@@ -186,4 +182,5 @@ if __name__=="__main__":
     KB.add(Clausel("-movie V -ice"))
     KB.add(Clausel("movie"))
     res = solver(KB)
-    print(type(res))
+    for item in res:
+        print(item)
